@@ -8,7 +8,4 @@ class VotarkUser(AbstractUser):
     location = models.CharField(max_length=30, blank=True)
     picture = models.DateField(null=True, blank=True)   
 
-    def perform_create(self, serializer):
-        serializer.data['password'] = make_password(serializer.data['password'])
-        user.save()
-        return Response({})
+   
