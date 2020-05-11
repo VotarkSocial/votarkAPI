@@ -21,6 +21,8 @@ from rest_framework_jwt.views import (
 )
 
 from votarkUser.views import VotarkUserViewSet
+from django.conf.urls.static import static
+from django.conf import settings
 
 router = routers.DefaultRouter()
 
@@ -36,3 +38,5 @@ urlpatterns = [
     url(r'^api/v1/token-auth/', obtain_jwt_token),
     url(r'^api/v1/token-refresh/', refresh_jwt_token),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
