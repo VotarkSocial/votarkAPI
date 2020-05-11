@@ -1,15 +1,15 @@
 from rest_framework import serializers
 
-from votarker.models import Votarker
+from votarkUser.models import VotarkUser
 
-class VotarkerSerializer(serializers.ModelSerializer):
+class VotarkUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Votarker
+        model = VotarkUser
         fields = (
             'id',
             'first_name',
             'last_name',
-            'username', 
+            'username',
             'password',
             'email',
             'bio',

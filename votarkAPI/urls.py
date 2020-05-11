@@ -20,11 +20,11 @@ from rest_framework_jwt.views import (
     refresh_jwt_token
 )
 
-from votarker.views import VotarkerViewSet
+from votarkUser.views import VotarkUserViewSet
 
 router = routers.DefaultRouter()
 
-router.register(r'user', VotarkerViewSet)
+router.register(r'user', VotarkUserViewSet)
 
 # elapp.com/pets
 # elapp.com/api/v1/pets
