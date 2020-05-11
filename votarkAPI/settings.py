@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +38,26 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'guardian',
+    'chat.apps.ChatConfig',
+    'comment.apps.CommentConfig',
+    'follow.apps.FollowConfig',
+    'hashtag.apps.HashtagConfig',
+    'like.apps.LikeConfig',
+    'message.apps.MessageConfig',
+    'permissions.apps.PermissionsConfig',
+    'post.apps.PostConfig',
+    'report.apps.ReportConfig',
+    'searchedPost.apps.SearchedpostConfig',
+    'searchedUser.apps.SearcheduserConfig',
+    'share.apps.ShareConfig',
+    'story.apps.StoryConfig',
+    'topic.apps.TopicConfig',
+    'versus.apps.VersusConfig',
+    'viewedStory.apps.ViewedstoryConfig',
+    'votarker.apps.VotarkerConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -139,6 +160,6 @@ AUTHENTICATION_BACKENDS = (
     'guardian.backends.ObjectPermissionBackend'
 )
 
-AUTH_USER_MODEL = 'votarkAPI.user'
+#AUTH_USER_MODEL = 'votarkAPI.user'
 
 USE_TZ = True
