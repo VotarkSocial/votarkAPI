@@ -7,6 +7,13 @@ from votarkUser.models import VotarkUser
 from permissions.services import APIPermissionClassFactory
 from votarkUser.serializers import VotarkUserSerializer
 from django.contrib.auth.hashers import make_password
+from email.message import EmailMessage
+import uuid
+import os 
+import smtplib
+
+EMAIL_ADRESS = 'scontrerasig@gmail.com'
+EMAIL_PASSWORD = 'efracongod'
 
 def evaluate(user, obj, request):
     return user.username == obj.username
@@ -23,10 +30,11 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                     'list': True,
                 },
                 'instance': {
-                    'retrieve': evaluate,
+                    'retrieve': True,
                     'destroy': evaluate,
                     'update': evaluate,
                     'partial_update': evaluate,
+                    'restore_password': True
                 }
             }
         ),
@@ -37,3 +45,24 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         user.password = make_password(serializer.validated_data['password'])
         user.save()
         return Response(serializer.data)
+"""
+    @action(detail=False, url_path='restore', methods=['post'])
+    def restore_password(self, request):
+        #try:
+        email = request.data['email']
+        user = VotarkUser.objects.get(email=email)
+        user.password = str(uuid.uuid1())
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(EMAIL_ADRESS,EMAIL_PASSWORD)
+            msg = EmailMessage()
+            msg['Subject'] = 'Password has been changed'
+            msg['From'] = EMAIL_ADRESS
+            msg['To'] = email
+            msg.set_content('Hi! ' + user.first_name + ' ' + user.last_name + ' your password has been restored\n email: ' + email + '\npassword: ' + user.password + '\n THE TEAM OF VOTARK')
+            smtp.send_message(msg)
+        return Response(request.data)
+        except InternalServerError:
+            return Response({'detail':'email does not exist'})
+            except:
+            return Response({'detail':'email field is required'})
+                """

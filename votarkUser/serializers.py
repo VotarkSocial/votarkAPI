@@ -17,3 +17,4 @@ class VotarkUserSerializer(serializers.ModelSerializer):
             'location',
             'picture' 
         )
+        extra_kwargs = {'password': {'write_only': True}}
