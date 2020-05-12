@@ -36,7 +36,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                     'partial_update': evaluate,
                     'restore_password': True
                 }
-            }
+              }
         ),
     )
 
@@ -46,24 +46,22 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         user.save()
         return Response(serializer.data)
 
-"""
+
     @action(detail=False, url_path='restore', methods=['post'])
     def restore_password(self, request):
-        #try:
-        email = request.data['email']
-        user = VotarkUser.objects.get(email=email)
-        user.password = str(uuid.uuid1())
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-            smtp.login(EMAIL_ADRESS,EMAIL_PASSWORD)
-            msg = EmailMessage()
-            msg['Subject'] = 'Password has been changed'
-            msg['From'] = EMAIL_ADRESS
-            msg['To'] = email
-            msg.set_content('Hi! ' + user.first_name + ' ' + user.last_name + ' your password has been restored\n email: ' + email + '\npassword: ' + user.password + '\n THE TEAM OF VOTARK')
-            smtp.send_message(msg)
-        return Response(request.data)
-        except InternalServerError:
-            return Response({'detail':'email does not exist'})
-            except:
-            return Response({'detail':'email field is required'})
-                """
+        try:
+            email = request.data['email']
+            user = VotarkUser.objects.get(email=email)
+            user.password = str(uuid.uuid1())
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+                smtp.login(EMAIL_ADRESS,EMAIL_PASSWORD)
+                msg = EmailMessage()
+                msg['Subject'] = 'Password has been changed'
+                msg['From'] = EMAIL_ADRESS
+                msg['To'] = email
+                msg.set_content('Hi! ' + user.first_name + ' ' + user.last_name + ' your password has been restored\n email: ' + email + '\npassword: ' + user.password + '\n THE TEAM OF VOTARK')
+                smtp.send_message(msg)
+            return Response(request.data)
+        except:
+            return Response({'detail':'email is not valid'})
+                
