@@ -12,8 +12,8 @@ import uuid
 import os 
 import smtplib
 
-EMAIL_ADRESS = 'scontrerasig@gmail.com'
-EMAIL_PASSWORD = 'efracongod'
+EMAIL_ADRESS = ''
+EMAIL_PASSWORD = ''
 
 def evaluate(user, obj, request):
     return user.username == obj.username
@@ -45,6 +45,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         user.password = make_password(serializer.validated_data['password'])
         user.save()
         return Response(serializer.data)
+
 """
     @action(detail=False, url_path='restore', methods=['post'])
     def restore_password(self, request):
