@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 class SearchedUser(models.Model):
     user = models.ForeignKey(
@@ -15,3 +16,4 @@ class SearchedUser(models.Model):
         null=True,
         blank=False
     )
+    date = models.DateField(default=now)

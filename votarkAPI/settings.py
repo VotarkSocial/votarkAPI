@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'permissions.apps.PermissionsConfig',
     'post.apps.PostConfig',
     'report.apps.ReportConfig',
-    'searchedPost.apps.SearchedpostConfig',
+    'searchedHashtag.apps.SearchedHashtagConfig',
     'searchedUser.apps.SearcheduserConfig',
     'share.apps.ShareConfig',
     'story.apps.StoryConfig',

@@ -1,7 +1,8 @@
 from django.db import models
+from django.utils.timezone import now
 
 class Versus(models.Model):
-    date = models.DateField()
+    date = models.DateField(default=now)
     post1 = models.ForeignKey(
         'post.Post',
         related_name='post1',

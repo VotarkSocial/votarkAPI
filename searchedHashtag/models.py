@@ -1,6 +1,7 @@
 from django.db import models
+from django.utils.timezone import now
 
-class SearchedPost(models.Model):
+class SearchedHashtag(models.Model):
     user = models.ForeignKey(
         'votarkUser.VotarkUser',
         on_delete=models.SET_NULL,
@@ -13,3 +14,4 @@ class SearchedPost(models.Model):
         null=True,
         blank=False
     )
+    date = models.DateField(default=now)

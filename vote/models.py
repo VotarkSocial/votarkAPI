@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 class Vote(models.Model):
     user = models.ForeignKey(
@@ -13,5 +14,5 @@ class Vote(models.Model):
         null=True,
         blank=False
     )
-    date = models.DateField()
-    winner = models.BooleanField(null=False,blank=False)    #True for Right - False for left
+    date = models.DateField(default=now)
+    winner = models.BooleanField(null=False,blank=False)    #True for Post1 - False for Post2s

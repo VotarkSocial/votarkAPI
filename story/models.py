@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 class Story(models.Model):
     content = models.ImageField(null=False, blank=False)
@@ -8,3 +9,4 @@ class Story(models.Model):
         null=True,
         blank=False
     )
+    date = models.DateField(default=now)

@@ -1,8 +1,9 @@
 from django.db import models
+from django.utils.timezone import now
 
 class Comment(models.Model):
     content = models.CharField(max_length=1000)
-    date = models.DateField()
+    date = models.DateField(default=now)
     user = models.ForeignKey(
         'votarkUser.VotarkUser',
         on_delete=models.SET_NULL,
