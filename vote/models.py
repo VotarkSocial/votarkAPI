@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.timezone import now
 
 class Vote(models.Model):
+    unique_together = (('user', 'versus'))
     user = models.ForeignKey(
         'votarkUser.VotarkUser',
         on_delete=models.SET_NULL,
@@ -16,3 +17,5 @@ class Vote(models.Model):
     )
     date = models.DateField(default=now)
     winner = models.BooleanField(null=False,blank=False)    #True for Post1 - False for Post2s
+
+    
