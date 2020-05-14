@@ -1,11 +1,11 @@
+from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
+from permissions.services import APIPermissionClassFactory
+from post.models import Post
+from post.serializers import PostSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from post.models import Post
-from permissions.services import APIPermissionClassFactory
-from post.serializers import PostSerializer
 
 def evaluate(user, obj, request):
     return user.id == obj.user.id
@@ -21,12 +21,12 @@ class PostViewSet(viewsets.ModelViewSet):
                     'create': True,
                     'list': True,
                 },
-                'instance': 
+                'instance': {
                     'retrieve': True,
                     'destroy': evaluate,
                     'update': evaluate,
                     'partial_update': evaluate,
                 }
-              }
+            }
         ),
     )

@@ -1,10 +1,10 @@
+from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
+from permissions.services import APIPermissionClassFactory
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 from searchedHashtag.models import SearchedHashtag
-from permissions.services import APIPermissionClassFactory
 from searchedHashtag.serializers import SearchedHashtagSerializer
 
 class SearchedHashtagViewSet(viewsets.ModelViewSet):
@@ -18,12 +18,12 @@ class SearchedHashtagViewSet(viewsets.ModelViewSet):
                     'create': True,
                     'list': False,
                 },
-                'instance': 
-                    'retrieve': False,
+                'instance':{ 
                     'destroy': False,
-                    'update': False,
                     'partial_update': False,
+                    'retrieve': False,
+                    'update': False,
                 }
-              }
+            }
         ),
     )

@@ -1,16 +1,17 @@
 from django.contrib.auth.models import User
+from django.db.models import Q
+from follow.models import Follow
 from guardian.shortcuts import assign_perm
+from like.models import Like
 from permissions.services import APIPermissionClassFactory
+from post.models import Post
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from share.models import Share
+from versus.models import Versus
 from vote.models import Vote
 from vote.serializers import VoteSerializer
-from post.models import Post
-from versus.models import Versus
-from follow.models import Follow
-from like.models import Like
-from share.models import Share
 import random
 
 def evaluate(user, obj, request):
@@ -27,13 +28,13 @@ class VoteViewSet(viewsets.ModelViewSet):
                     'create': True,
                     'list': True,
                 },
-                'instance': 
-                    'retrieve': True,
+                'instance': {
                     'destroy': False,
-                    'update': False,
                     'partial_update': False,
+                    'retrieve': True,
+                    'update': False,
                 }
-              }
+            }
         ),
     )
 
@@ -93,10 +94,10 @@ class VoteViewSet(viewsets.ModelViewSet):
                     post.save()
                 else:
                     followerOnPost = 0
-                    for versus in Versus.objects.filter(post1=post)+Versus.objects.filter(post2=post):                  #Followers because of the Post
+                    for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):                  #Followers because of the Post
                         followerOnPost += Follow.objects.filter(onVersus=versus).Count()
                     followerOnCurrent = 0
-                    for versus in Versus.objects.filter(post1=post)+Versus.objects.filter(post2=post):
+                    for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):
                         followerOnCurrent += Follow.objects.filter(onVersus=versus).Count()
                     if(followerOnCurrent>followerOnPost):
                         hasToChangedOrder = False
@@ -107,10 +108,10 @@ class VoteViewSet(viewsets.ModelViewSet):
                         post.save()
                     else:
                         shareOnPost = 0
-                        for versus in Versus.objects.filter(post1=post)+Versus.objects.filter(post2=post):                  #shares because of the Post
+                        for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):                  #shares because of the Post
                             shareOnPost += Share.objects.filter(versus=versus).Count()
                         shareOnCurrent = 0
-                        for versus in Versus.objects.filter(post1=post)+Versus.objects.filter(post2=post):
+                        for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):
                             shareOnCurrent += Share.objects.filter(versus=versus).Count()
                         if(shareOnCurrent>shareOnPost):
                             hasToChangedOrder = False
@@ -121,10 +122,10 @@ class VoteViewSet(viewsets.ModelViewSet):
                             post.save()
                         else:
                             likeOnPost = 0
-                            for versus in Versus.objects.filter(post1=post)+Versus.objects.filter(post2=post):               #Likes because of the Post
+                            for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):               #Likes because of the Post
                                 likeOnPost += Like.objects.filter(versus=versus).Count()
                             likeOnCurrent = 0
-                            for versus in Versus.objects.filter(post1=post)+Versus.objects.filter(post2=post):
+                            for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):
                                 likeOnCurrent += Like.objects.filter(versus=versus).Count()
                             if(likeOnCurrent>likeOnPost):
                                 hasToChangedOrder = False

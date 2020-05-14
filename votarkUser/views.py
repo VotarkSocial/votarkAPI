@@ -1,25 +1,32 @@
 from chat.models import Chat
+from chat.serializers import ChatSerializer
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from email.message import EmailMessage
 from follow.models import Follow
+from follow.serializers import FollowSerializer
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_objects_for_user
 from permissions.services import APIPermissionClassFactory
+from post.models import Post
+from post.serializers import PostSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from votarkUser.models import VotarkUser
-from votarkUser.serializers import VotarkUserSerializer
-from follow.serializers import FollowSerializer
-from chat.serializers import ChatSerializer
 from searchedHashtag.models import SearchedHashtag
 from searchedHashtag.serializers import SearchedHashtagSerializer
 from searchedUser.models import SearchedUser
 from searchedUser.serializers import SearchedUserSerializer
+from topic.views import getTrending
+from versus.models import Versus
+from versus.serializers import VersusSerializer
+from versus.views import get_element_random, pick_post
 from viewedStory.models import ViewedStory
 from viewedStory.serializers import ViewedStorySerializer
+from votarkUser.models import VotarkUser
+from votarkUser.serializers import VotarkUserSerializer
 import os 
+import random
 import smtplib
 import uuid
 
@@ -46,14 +53,16 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                     'followers': True,
                     'following': True,
                     'partial_update': evaluate,
+                    'pick': evaluate,
+                    'posts': True,
                     'restore_password': True,
                     'retrieve': True,
                     'searh_history_post':evaluate,
                     'searh_history_user':evaluate,
+                    'stories': evaluate,
                     'update': evaluate,
-                    'stories': evaluate
                 }
-              }
+            }
         ),
     )
 
@@ -158,4 +167,55 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
             response.append(current_response[key])                                                      #Returning them in the specified order
         return Response(response)
     
-    
+    @action(detail=True, methods=['get'])
+    def mystories(self, request, pk=None):
+        user = self.get_object()
+        response = []
+        for story in Story.objects.filter(user=user).order_by('-date'):
+            response.append(StorySerializer(story).data)
+        return Response(response)
+
+    @action(detail=True, methods=['get'])
+    def posts(self, request, pk=None):
+        user = self.get_object()
+        response = []
+        for post in Post.objects.filter(user=user).order_by('-date'):
+            response.append(PostSerializer(post).data)
+        return Response(response)
+
+    @action(detail=True, methods=['get'])
+    def pick(self, request, pk=None):
+        post = None
+        while(post==None):
+            choose = random.randint(0,10)
+            if(choose<6):                                                                  #60% of the times it will choose from the followed users
+                user = self.get_object()
+                index = 0
+                order = {}
+                valid_posts = []
+                orderby = '-date'                                                           #75% new posts will be returned
+                if(random.randint(0,4)==0):
+                    order_by = '-order'                                                     #25% trending will be returned
+                for post in Post.objects.order_by(orderby):
+                    for following in Follow.objects.filter(follower=user).order():
+                        if(post.user==following):
+                            value = index
+                            if(SearchesUser.objects.filter(searchedUser=following, user=user).Count()==0):          #User has not searched him
+                                value+=10
+                            else:
+                                value-=5*SearchesUser.objects.filter(searchedUser=following, user=user).Count()     #This will make users with more searches come first
+                            valid_posts.append(post)
+                            order[index] = value
+                    index+=1
+                post=get_element_random(valid_posts,order)
+            elif(choose>=6 and choose<10):                                                 #40% of the times it will choose from trending
+                trending = getTrending(20)
+                trend = random.choice(trending)
+                topic = Topic.objects.filter(name=trend.topic)
+                post = pick_post(topic)
+        newPost = pick_post(post.topic)
+        if (Versus.objects.filter(post1=post, post2=newPost).Count()==0):
+            versus = Versus.create(post1=post, post2=pick_post(post.topic))
+            versus.save()
+            return Response(VersusSerializer(versus).data)
+        return Response(VersusSerializer(Versus.objects.filter(post1=post, post2=newPost)[0]).data)

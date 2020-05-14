@@ -1,10 +1,10 @@
+from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
+from permissions.services import APIPermissionClassFactory
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth.models import User
 from story.models import Story
-from permissions.services import APIPermissionClassFactory
 from story.serializers import StorySerializer
 
 def evaluate(user, obj, request):
@@ -21,12 +21,12 @@ class StoryViewSet(viewsets.ModelViewSet):
                     'create': True,
                     'list': True,
                 },
-                'instance': 
-                    'retrieve': True,
+                'instance': {
                     'destroy': evaluate,
-                    'update': False,
                     'partial_update': False,
+                    'retrieve': True,
+                    'update': False,
                 }
-              }
+            }
         ),
     )

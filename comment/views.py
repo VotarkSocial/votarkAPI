@@ -1,11 +1,11 @@
+from comment.models import Comment
+from comment.serializers import CommentSerializer
+from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
+from permissions.services import APIPermissionClassFactory
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from comment.models import Comment
-from permissions.services import APIPermissionClassFactory
-from comment.serializers import CommentSerializer
 
 def evaluate(user, obj, request):
     return user.id == obj.user.id
@@ -21,12 +21,12 @@ class CommentViewSet(viewsets.ModelViewSet):
                     'create': True,
                     'list': False,
                 },
-                'instance': 
-                    'retrieve': evaluate,
+                'instance': {
                     'destroy': evaluate,
-                    'update': evaluate,
                     'partial_update': evaluate,
+                    'retrieve': evaluate,
+                    'update': evaluate,
                 }
-              }
+            }
         ),
     )

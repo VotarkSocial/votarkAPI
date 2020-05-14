@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from votarkUser.models import VotarkUser
 
 class VotarkUserSerializer(serializers.ModelSerializer):

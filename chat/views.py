@@ -1,13 +1,13 @@
+from chat.models import Chat
+from chat.serializers import ChatSerializer
+from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
+from message.models import Message
+from message.serializers import MessageSerializer
+from permissions.services import APIPermissionClassFactory
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from chat.models import Chat
-from message.models import Message
-from permissions.services import APIPermissionClassFactory
-from chat.serializers import ChatSerializer
-from message.serializers import MessageSerializer
 
 class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all()
@@ -20,16 +20,16 @@ class ChatViewSet(viewsets.ModelViewSet):
                     'create': True,
                     'list': False,
                 },
-                'instance': 
-                    'retrieve': 'chat.view_chat',
-                    'destroy': 'chat.admin_chat',
-                    'update': 'chat.admin_chat',
-                    'partial_update': 'chat.admin_chat',
-                    'messages': 'chat.view_chat',
+                'instance': {
                     'add_admin': 'chat.admin_chat',
                     'add': 'chat.admin_chat
+                    'destroy': 'chat.admin_chat',
+                    'messages': 'chat.view_chat',
+                    'partial_update': 'chat.admin_chat',
+                    'retrieve': 'chat.view_chat',
+                    'update': 'chat.admin_chat',
                 }
-              }
+            }
         ),
     )
 
