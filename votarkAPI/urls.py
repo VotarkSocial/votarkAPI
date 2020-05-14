@@ -37,11 +37,13 @@ from vote.views import VoteViewSet
 
 from django.conf.urls.static import static
 from django.conf import settings
+from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet
 
 router = routers.DefaultRouter()
 
 router.register(r'chat', ChatViewSet)
 router.register(r'comment', CommentViewSet)
+router.register(r'devices',FCMDeviceAuthorizedViewSet)
 router.register(r'follow', FollowViewSet)
 router.register(r'hashtag', HashtagViewSet)
 router.register(r'like', LikeViewSet)

@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'guardian',
-
+    "fcm_django",
 
     'chat.apps.ChatConfig',
     'comment.apps.CommentConfig',
@@ -176,3 +176,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'guardian.backends.ObjectPermissionBackend'
 )
+
+FCM_DJANGO_SETTINGS = {
+        "APP_VERBOSE_NAME": "Votark",
+        "FCM_SERVER_KEY": SECRET_KEY,
+        "ONE_DEVICE_PER_USER": False,
+        "DELETE_INACTIVE_DEVICES": False,
+}

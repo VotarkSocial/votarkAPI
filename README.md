@@ -43,6 +43,10 @@ comment
     api/v1/comment                  'get','post'
     api/v1/comment/id               'delete','patch','get'
 
+Devices:
+
+    ALL URL FROM PUSH NOTIFICATIONS FCM
+
 Follow: 
 
     date = models.DateField(default=now)
@@ -126,7 +130,8 @@ message:
 
 post:
 
-    content = models.ImageField(null=False, blank=False)
+    image = models.ImageField(null=True, blank=True)
+    video = models.FileField(upload_to='videos/', null=True, verbose_name="")
     description = models.CharField(max_length=500)
     victories = models.IntegerField()
     date = models.DateField(default=now)
@@ -183,7 +188,8 @@ Share:
 
 story: 
 
-    content = models.ImageField(null=False, blank=False)
+    image = models.ImageField(null=True, blank=True)
+    video = models.FileField(upload_to='videos/', null=True, verbose_name="")
     user = models.ForeignKey(
         'votarkUser.VotarkUser',
         on_delete=models.SET_NULL,
