@@ -8,6 +8,6 @@ class SearchedHashtagSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'date',
-            'post',
+            'hashtag',
             'user',
         )

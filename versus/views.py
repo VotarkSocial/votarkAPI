@@ -123,6 +123,7 @@ class VersusViewSet(viewsets.ModelViewSet):
                     'destroy': False,
                     'likes': True,
                     'partial_update': False,
+                    'pick': True,
                     'retrieve': True,
                     'shares': True,
                     'update': False,

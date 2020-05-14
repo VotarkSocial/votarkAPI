@@ -73,17 +73,17 @@ class VoteViewSet(viewsets.ModelViewSet):
             else:
                 secondaryVictories_post = 0
                 for versus in Versus.objects.filter(post1=post):                                                        #Secondary Victories 
-                    for vote_ in Vote.objects.filter(versus=versus, winner=True)
+                    for vote_ in Vote.objects.filter(versus=versus, winner=True):
                         secondaryVictories_post += versus.post2.victories
                 for versus in Versus.objects.filter(post2=post):
-                    for vote_ in Vote.objects.filter(versus=versus, winner=False)
+                    for vote_ in Vote.objects.filter(versus=versus, winner=False):
                         secondaryVictories_post += versus.post1.victories
                 secondaryVictories_current = 0
                 for versus in Versus.objects.filter(post1=currentPost):
-                    for vote_ in Vote.objects.filter(versus=versus, winner=True)
+                    for vote_ in Vote.objects.filter(versus=versus, winner=True):
                         secondaryVictories_current += versus.post2.victories
                 for versus in Versus.objects.filter(post2=currentPost):
-                    for vote_ in Vote.objects.filter(versus=versus, winner=False)
+                    for vote_ in Vote.objects.filter(versus=versus, winner=False):
                         secondaryVictories_current += versus.post1.victories
                 if(secondaryVictories_current>secondaryVictories_post):
                     hasToChangedOrder = False
@@ -135,7 +135,6 @@ class VoteViewSet(viewsets.ModelViewSet):
                                 currentPost.save()
                                 post.save()
                             else:
-                                pick = 
                                 if(likeOnCurrent>likeOnPost):
                                     hasToChangedOrder = False
                                 elif(likeOnCurrent<likeOnPost):

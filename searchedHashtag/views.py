@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
+from hashtag.models import Hashtag
+from hashtag.serializers import HashtagSerializer
 from permissions.services import APIPermissionClassFactory
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -15,7 +17,7 @@ class SearchedHashtagViewSet(viewsets.ModelViewSet):
             name='EventPermission',
             permission_configuration={
                 'base': {
-                    'create': True,
+                    'create': False,
                     'list': False,
                 },
                 'instance':{ 

@@ -52,13 +52,16 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                     'destroy': evaluate,
                     'followers': True,
                     'following': True,
+                    'mystories':evaluate,
                     'partial_update': evaluate,
                     'pick': evaluate,
                     'posts': True,
                     'restore_password': True,
                     'retrieve': True,
-                    'searh_history_post':evaluate,
-                    'searh_history_user':evaluate,
+                    'search_history_hashtag':evaluate,
+                    'search_history_user':evaluate,
+                    'searchHastag': True,
+                    'searchUser': True,
                     'stories': evaluate,
                     'update': evaluate,
                 }
@@ -117,7 +120,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         return Response(response)
 
     @action(detail=True, methods=['get'])
-    def searh_history_post(self, request, pk=None):
+    def search_history_hashtag(self, request, pk=None):
         user = self.get_object()
         response = []
         for searched in SearchedHashtag.objects.filter(user=user).order_by('-date'):
@@ -125,12 +128,47 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         return Response(response)
 
     @action(detail=True, methods=['get'])
-    def searh_history_user(self, request, pk=None):
+    def search_history_user(self, request, pk=None):
         user = self.get_object()
         response = []
         for searched in SearchedUser.objects.filter(searchedUser=user).order_by('-date'):
             response.append(SearchedUserSerializer(searched).data)
         return Response(response)
+
+    
+    @action(detail=True, methods=['post'])
+    def search_user(self, request):
+        user = self.get_object()
+        try:
+            query = request.data['query']
+            users = VotarkUser.objects.filter(username__contains=query)
+            response=[]
+            limit=5
+            for votarker in users:
+                if(limit>0):
+                    SearchedUser.objects.create(user=user, searchedUser=votarker)
+                    response.append(SearchedUserSerializer(votarker).data)
+                limit-=1
+            return Response(response)
+        except:
+            return Response({'detail':'query is not valid'})
+
+    @action(detail=True, methods=['post'])
+    def search_hastag(self, request):
+        user = self.get_object()
+        try:
+            query = request.data['query']
+            hashtags = Hashtag.objects.filter(content__contains=query)
+            response=[]
+            limit=5
+            for Hashtag in hashtags:
+                if(limit>0):
+                    SearchedHashtag.objects.create(Hashtag=Hashtag, user=user)
+                    response.append(SearchedUserSerializer(Hashtag).data)
+                limit-=1
+            return Response(response)
+        except:
+            return Response({'detail':'query is not valid'})
 
     @action(detail=True, methods=['get'])
     def stories(self, request, pk=None):

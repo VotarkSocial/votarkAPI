@@ -19,7 +19,7 @@ class MessageViewSet(viewsets.ModelViewSet):
             permission_configuration={
                 'base': {
                     'create': True,
-                    'list': True,
+                    'list': False,
                 },
                 'instance': {
                     'retrieve': True,

@@ -6,6 +6,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from story.models import Story
 from story.serializers import StorySerializer
+from viewedStory.models import ViewedStory
+from viewedStory.serializers import ViewedStorySerializer
+
 
 def evaluate(user, obj, request):
     return user.id == obj.user.id
@@ -26,7 +29,16 @@ class StoryViewSet(viewsets.ModelViewSet):
                     'partial_update': False,
                     'retrieve': True,
                     'update': False,
+                    'views': evaluate
                 }
             }
         ),
     )
+
+    @action(detail=True, methods=['get'])
+    def views(self, request, pk=None):
+        story = self.get_object()
+        response = []
+        for view in ViewedStorySerializer.objects.filter(story=story):
+            response.append(ViewedStorySerializer(view).data)
+        return Response(response)

@@ -8,7 +8,7 @@ class SearchedHashtag(models.Model):
         null=True,
         blank=False
     )
-    post = models.ForeignKey(
+    hashtag = models.ForeignKey(
         'post.Post',
         on_delete=models.SET_NULL,
         null=True,

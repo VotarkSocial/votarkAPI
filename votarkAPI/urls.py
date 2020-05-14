@@ -19,14 +19,42 @@ from rest_framework_jwt.views import (
     obtain_jwt_token,
     refresh_jwt_token
 )
-
+from chat.views import ChatViewSet
+from comment.views import CommentViewSet
+from follow.views import FollowViewSet
+from hashtag.views import HashtagViewSet
+from like.views import LikeViewSet
+from message.views import MessageViewSet
+from post.views import PostViewSet
+from report.views import ReportViewSet
+from share.views import ShareViewSet
+from story.views import StoryViewSet
+from topic.views import TopicViewSet
+from versus.views import VersusViewSet
+from viewedStory.views import ViewedStoryViewSet
 from votarkUser.views import VotarkUserViewSet
+from vote.views import VoteViewSet
+
 from django.conf.urls.static import static
 from django.conf import settings
 
 router = routers.DefaultRouter()
 
+router.register(r'chat', ChatViewSet)
+router.register(r'comment', CommentViewSet)
+router.register(r'follow', FollowViewSet)
+router.register(r'hashtag', HashtagViewSet)
+router.register(r'like', LikeViewSet)
+router.register(r'message', MessageViewSet)
+router.register(r'post', PostViewSet)
+router.register(r'report', ReportViewSet)
+router.register(r'share', ShareViewSet)
+router.register(r'story', StoryViewSet)
+router.register(r'topic', TopicViewSet)
+router.register(r'versus', VersusViewSet)
+router.register(r'viewed_story', ViewedStoryViewSet)
 router.register(r'user', VotarkUserViewSet)
+router.register(r'vote', VoteViewSet)
 
 # elapp.com/pets
 # elapp.com/api/v1/pets

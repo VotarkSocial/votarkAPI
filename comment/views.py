@@ -19,12 +19,12 @@ class CommentViewSet(viewsets.ModelViewSet):
             permission_configuration={
                 'base': {
                     'create': True,
-                    'list': False,
+                    'list': True,
                 },
                 'instance': {
                     'destroy': evaluate,
                     'partial_update': evaluate,
-                    'retrieve': evaluate,
+                    'retrieve': True,
                     'update': evaluate,
                 }
             }

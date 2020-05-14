@@ -15,7 +15,7 @@ class SearchedUserViewSet(viewsets.ModelViewSet):
             name='EventPermission',
             permission_configuration={
                 'base': {
-                    'create': True,
+                    'create': False,
                     'list': False,
                 },
                 'instance': {

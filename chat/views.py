@@ -22,7 +22,7 @@ class ChatViewSet(viewsets.ModelViewSet):
                 },
                 'instance': {
                     'add_admin': 'chat.admin_chat',
-                    'add': 'chat.admin_chat
+                    'add': 'chat.admin_chat',
                     'destroy': 'chat.admin_chat',
                     'messages': 'chat.view_chat',
                     'partial_update': 'chat.admin_chat',
@@ -64,7 +64,7 @@ class ChatViewSet(viewsets.ModelViewSet):
         try:
             chat = self.get_object()
             username = request.data['username']
-            user = VotarkUser.objects.get(username=username
+            user = VotarkUser.objects.get(username=username)
             assign_perm('chat.view_chat', user, chat)
             assign_perm('chat.admin_chat', user, chat)
             return Response(serializer.data)

@@ -2,7 +2,8 @@ from django.db import models
 from django.utils.timezone import now
 
 class Post(models.Model):
-    content = models.ImageField(null=False, blank=False)
+    image = models.ImageField(null=True, blank=True)
+    video = models.FileField(upload_to='videos/', null=True, verbose_name="")
     description = models.CharField(max_length=500)
     victories = models.IntegerField()
     date = models.DateField(default=now)

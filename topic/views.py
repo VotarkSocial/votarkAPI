@@ -35,6 +35,8 @@ class TopicViewSet(viewsets.ModelViewSet):
                 },
                 'instance': {
                     'destroy': evaluate,
+                    'hashtags': True,
+                    'order':evaluate,
                     'partial_update': evaluate,
                     'retrieve': True,
                     'trending': True,
