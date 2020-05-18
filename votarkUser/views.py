@@ -10,6 +10,7 @@ from guardian.shortcuts import get_objects_for_user
 from permissions.services import APIPermissionClassFactory
 from post.models import Post
 from post.serializers import PostSerializer
+from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -82,7 +83,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
             email = request.data['email']
             user = VotarkUser.objects.get(email=email)
             password = str(uuid.uuid1())
-            user.password = password
+            user.password = make_password(password)
             user.save()
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login(EMAIL_ADRESS,EMAIL_PASSWORD)
@@ -90,11 +91,11 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                 msg['Subject'] = 'Password has been changed'
                 msg['From'] = EMAIL_ADRESS
                 msg['To'] = email
-                msg.set_content('Hi! ' + user.first_name + ' ' + user.last_name + ' your password has been restored\n username: ' + user.username + '\npassword: ' + password + '\n THE TEAM OF VOTARK')
+                msg.set_content('Hi! ' + user.first_name + ' ' + user.last_name + ' your password has been restored\nusername: ' + user.username + '\npassword: ' + password + '\n\n\n THE TEAM OF VOTARK')
                 smtp.send_message(msg)
             return Response(request.data)
         except:
-            return Response({'detail':'email is not valid'})
+            return Response({'detail':'email is not valid'},status=status.HTTP_400_BAD_REQUEST)
                 
 
     @action(detail=True, methods=['get'])
