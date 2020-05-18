@@ -30,8 +30,8 @@ import random
 import smtplib
 import uuid
 
-EMAIL_ADRESS = ''
-EMAIL_PASSWORD = ''
+EMAIL_ADRESS = 'votark.socialnet@gmail.com'
+EMAIL_PASSWORD = os.environ.get('PASSWORD')
 
 def evaluate(user, obj, request):
     return user.username == obj.username
@@ -81,14 +81,16 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         try:
             email = request.data['email']
             user = VotarkUser.objects.get(email=email)
-            user.password = str(uuid.uuid1())
+            password = str(uuid.uuid1())
+            user.password = password
+            user.save()
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login(EMAIL_ADRESS,EMAIL_PASSWORD)
                 msg = EmailMessage()
                 msg['Subject'] = 'Password has been changed'
                 msg['From'] = EMAIL_ADRESS
                 msg['To'] = email
-                msg.set_content('Hi! ' + user.first_name + ' ' + user.last_name + ' your password has been restored\n email: ' + email + '\npassword: ' + user.password + '\n THE TEAM OF VOTARK')
+                msg.set_content('Hi! ' + user.first_name + ' ' + user.last_name + ' your password has been restored\n username: ' + user.username + '\npassword: ' + password + '\n THE TEAM OF VOTARK')
                 smtp.send_message(msg)
             return Response(request.data)
         except:
