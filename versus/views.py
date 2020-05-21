@@ -2,6 +2,7 @@ from comment.models import Comment
 from comment.serializers import CommentSerializer
 from django.contrib.auth.models import User
 from django.db.models import Q
+from follow.models import Follow
 from guardian.shortcuts import assign_perm
 from like.models import Like
 from like.serializers import LikeSerializer
@@ -15,12 +16,23 @@ from share.models import Share
 from share.serializers import ShareSerializer
 from versus.models import Versus
 from versus.serializers import VersusSerializer
+from vote.models import Vote
 import random
+
+def getComments(versus):
+    response = []
+    for comment in Comment.objects.filter(versus=versus):
+        response.append(CommentSerializer(comment).data)
+    for comment in Comment.objects.filter(post=versus.post1):
+        response.append(CommentSerializer(comment).data)
+    for comment in Comment.objects.filter(post=versus.post2):
+        response.append(CommentSerializer(comment).data)
+    return (response)    
 
 def get_element_random(elements,order):                                                               #With a list of valid elements and an order
     valid_elements = []                                                                            #It will return a element
     for key in order:                                                                              #choosing a post randomly
-        valid_post.append(elements[key])                                                           #going through all the elements in the orden given
+        valid_elements.append(elements[key])                                                           #going through all the elements in the orden given
     n=len(valid_elements)                                                                          #choosing if that post will be returned
     index = 0                                                                                      #with a 20% of probability, if randomly it 
     n=len(valid_elements)                                                                          #chooses it, it returns it, elsewhere
@@ -34,62 +46,92 @@ def get_element_random(elements,order):                                         
     return None
 
 def pick_by_like(topic):
+    if(len(Post.objects.filter(topic=topic))==0):
+        return None
     posts = Post.objects.filter(topic=topic)
     order = {}
     index = 0
     for valid_post in posts:
+        value = index
         versus = Versus.objects.filter(Q(post1=valid_post) | Q(post2=valid_post))
-        if(Vote.objects.filter(versus=versus).Count()==0):
-            order[index] = Like.objects.filter(versus=versus).Count()
-            index += 1
-    order = {k: v for k, v in sorted(x.items(), key=lambda item: item[1])}                          #Sorting by ammount of likes
+        if(len(Versus.objects.filter(Q(post1=valid_post) | Q(post2=valid_post)))==0):
+            order[index] = value
+        else:
+            for vers in versus:
+                value += len(Like.objects.filter(versus=vers))
+            order[index] = value
+        index += 1
+    order = {k: v for k, v in sorted(order.items(), key=lambda item: item[1])}                          #Sorting by ammount of likes
     return get_element_random(posts,order)
 
-def pick_by_date(post):
-    posts = Post.objects.filter(topic=post.topic).order('-date')
+def pick_by_date(topic):
+    if(len(Post.objects.filter(topic=topic).order_by('-date'))==0):
+        return None
+    posts = Post.objects.filter(topic=topic).order_by('-date')
     index = 0
     order = {}
     valid_posts = []
     for valid_post in posts:
-        versus = Versus.objects.filter(Q(post1=valid_post) | Q(post2=valid_post))
-        if(Vote.objects.filter(versus=versus).Count()==0):
-            order[index] = index
+        value = index
+        order[index] = index
+        index+=1
     return get_element_random(posts,order)
 
 def pick_by_comment(topic):
+    if(len(Post.objects.filter(topic=topic))==0):
+        return None
     posts = Post.objects.filter(topic=topic)
     order = {}
     index = 0
     for valid_post in posts:
+        value = index
         versus = Versus.objects.filter(Q(post1=valid_post) | Q(post2=valid_post))
-        if(Vote.objects.filter(versus=versus).Count()==0):
-            order[index] = Comment.objects.filter(Q(versus=versus) | Q(post=valid_post)).Count()
-            index += 1
-    order = {k: v for k, v in sorted(x.items(), key=lambda item: item[1])}                          #Sorting by ammount of comments
+        if(len(Versus.objects.filter(Q(post1=valid_post) | Q(post2=valid_post)))==0):
+            order[index] = value
+        else:
+            for vers in versus:
+                value += len(Comment.objects.filter(Q(versus=vers) | Q(post=valid_post)))
+            order[index] = value
+        index += 1
+    order = {k: v for k, v in sorted(order.items(), key=lambda item: item[1])}                          #Sorting by ammount of comments
     return get_element_random(posts,order)
 
 def pick_by_follow(topic):
+    if(len(Post.objects.filter(topic=topic))==0):
+        return None
     posts = Post.objects.filter(topic=topic)
     order = {}
     index = 0
-    for valid_post in posts:
+    for valid_post in Post.objects.filter(topic=topic):
+        value = index
         versus = Versus.objects.filter(Q(post1=valid_post) | Q(post2=valid_post))
-        if(Vote.objects.filter(versus=versus).Count()==0):
-            order[index] = Follow.objects.filter(onVersus=versus).Count()
-            index += 1
-    order = {k: v for k, v in sorted(x.items(), key=lambda item: item[1])}                          #Sorting by ammount of followers obtained by that post
+        if(len(Versus.objects.filter(Q(post1=valid_post) | Q(post2=valid_post)))==0):
+            order[index] = value
+        else:
+            for vers in versus:
+                value += len(Follow.objects.filter(onVersus=vers))
+            order[index] = value
+        index += 1
+    order = {k: v for k, v in sorted(order.items(), key=lambda item: item[1])}                          #Sorting by ammount of followers obtained by that post
     return get_element_random(posts,order)
 
 def pick_by_share(topic):
+    if(len(Post.objects.filter(topic=topic))==0):
+        return None
     posts = Post.objects.filter(topic=topic)
     order = {}
     index = 0
     for valid_post in posts:
+        value = index
         versus = Versus.objects.filter(Q(post1=valid_post) | Q(post2=valid_post))
-        if(Vote.objects.filter(versus=versus).Count()==0):
-            order[index] = Share.objects.filter(versus=versus).Count()
-            index += 1
-    order = {k: v for k, v in sorted(x.items(), key=lambda item: item[1])}                          #Sorting by ammount of shares
+        if(len(Versus.objects.filter(Q(post1=valid_post) | Q(post2=valid_post)))==0):
+            order[index] = value
+        else:
+            for vers in versus:
+                value += len(Share.objects.filter(versus=vers))
+            order[index] = value
+        index += 1
+    order = {k: v for k, v in sorted(order.items(), key=lambda item: item[1])}                          #Sorting by ammount of shares
     return get_element_random(posts,order)
 
 def pick_post(topic):                                                                 #With a given topic it returns a post
@@ -106,6 +148,7 @@ def pick_post(topic):                                                           
             newPost = pick_by_follow(topic)
         elif(choose>=90 and choose<100):                                                #10% of the times it will choose a post based on shares   
             newPost = pick_by_share(topic)
+    return newPost
 
 class VersusViewSet(viewsets.ModelViewSet):
     queryset = Versus.objects.all()
@@ -127,6 +170,8 @@ class VersusViewSet(viewsets.ModelViewSet):
                     'retrieve': True,
                     'shares': True,
                     'update': False,
+                    'like': True,
+                    'heart': True
                 }
             }
         ),
@@ -135,14 +180,7 @@ class VersusViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def comments(self, request, pk=None):
         versus = self.get_object()
-        response = []
-        for comment in Comment.objects.filter(versus=versus):
-            response.append(CommentSerializer(comment).data)
-        for comment in Comment.objects.filter(post=versus.post1):
-            response.append(CommentSerializer(comment).data)
-        for comment in Comment.objects.filter(post=versus.post2):
-            response.append(CommentSerializer(comment).data)
-        return Response(response)    
+        return Response(getComments(versus))
 
     @action(detail=True, methods=['get'])
     def likes(self, request, pk=None):
@@ -153,6 +191,22 @@ class VersusViewSet(viewsets.ModelViewSet):
         return Response(response)    
 
     @action(detail=True, methods=['get'])
+    def like(self, request, pk=None):
+        user = self.request.user
+        versus = self.get_object()
+        if(len(Like.objects.filter(reaction=0, user=user, versus=versus))!=0):
+            return Response(LikeSerializer(Like.objects.filter(reaction=0, user=user, versus=versus)).data)
+        return Response({'result':False})
+
+    @action(detail=True, methods=['get'])
+    def heart(self, request, pk=None):
+        user = self.request.user
+        versus = self.get_object()
+        if(len(Like.objects.filter(reaction=1, user=user, versus=versus))!=0):
+            return Response(LikeSerializer(Like.objects.filter(reaction=1, user=user, versus=versus)).data)
+        return Response({'result':False})    
+
+    @action(detail=True, methods=['get'])
     def shares(self, request, pk=None):
         versus = self.get_object()
         response = []
@@ -160,18 +214,7 @@ class VersusViewSet(viewsets.ModelViewSet):
             response.append(ShareSerializer(share).data)
         return Response(response)
 
-    @action(detail=False, url_path='pick', methods=['post'])
-    def pick(self, request, pk=None):
-        try:
-            postid= request.data['postid']
-            post = Post.objects.get(id=postid)
-            newPost = pick_post(post.topic)
-            if (Versus.objects.filter(post1=post, post2=newPost).Count()==0):
-                versus = Versus.create(post1=post, post2=pick_post(post.topic))
-                versus.save()
-                return Response(VersusSerializer(versus).data)
-            return Response(VersusSerializer(Versus.objects.filter(post1=post, post2=newPost)[0]).data)
-        except:
-            return Response({'detail':'postid is not valid'})
+    
+    
 
     

@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.timezone import now
 
 class Follow(models.Model):
-    date = models.DateField(default=now)
+    date = models.DateTimeField(default=now)
     onVersus = models.ForeignKey(
         'versus.Versus',
         on_delete=models.SET_NULL,

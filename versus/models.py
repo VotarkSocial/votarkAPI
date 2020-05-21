@@ -3,7 +3,7 @@ from django.utils.timezone import now
 
 class Versus(models.Model):
     unique_together = (('post1', 'post2'))
-    date = models.DateField(default=now)
+    date = models.DateTimeField(default=now)
     post1 = models.ForeignKey(
         'post.Post',
         related_name='post1',

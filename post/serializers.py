@@ -7,7 +7,8 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = (
             'id',
-            'content',
+            'image',
+            'video',
             'date',
             'description',
             'order',

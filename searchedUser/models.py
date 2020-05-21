@@ -16,4 +16,4 @@ class SearchedUser(models.Model):
         null=True,
         blank=False
     )
-    date = models.DateField(default=now)
+    date = models.DateTimeField(default=now)

@@ -3,7 +3,7 @@ from django.utils.timezone import now
 
 class Like(models.Model):
     reaction = models.IntegerField()
-    date = models.DateField(default=now)
+    date = models.DateTimeField(default=now)
     versus = models.ForeignKey(
         'versus.Versus',
         on_delete=models.SET_NULL,

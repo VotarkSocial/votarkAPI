@@ -7,6 +7,7 @@ from follow.models import Follow
 from follow.serializers import FollowSerializer
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_objects_for_user
+from like.models import Like
 from permissions.services import APIPermissionClassFactory
 from post.models import Post
 from post.serializers import PostSerializer
@@ -18,14 +19,16 @@ from searchedHashtag.models import SearchedHashtag
 from searchedHashtag.serializers import SearchedHashtagSerializer
 from searchedUser.models import SearchedUser
 from searchedUser.serializers import SearchedUserSerializer
+from topic.models import Topic
 from topic.views import getTrending
 from versus.models import Versus
 from versus.serializers import VersusSerializer
-from versus.views import get_element_random, pick_post
+from versus.views import get_element_random, pick_post, getComments
 from viewedStory.models import ViewedStory
 from viewedStory.serializers import ViewedStorySerializer
 from votarkUser.models import VotarkUser
 from votarkUser.serializers import VotarkUserSerializer
+from vote.models import Vote
 import os 
 import random
 import smtplib
@@ -36,6 +39,56 @@ EMAIL_PASSWORD = os.environ.get('PASSWORD')
 
 def evaluate(user, obj, request):
     return user.username == obj.username
+
+def getVersus(user):
+    post = None
+    done = False
+    returning = None
+    while(done==False):
+        while(post==None):
+            choose = random.randint(0,10)
+            if(choose<6):               
+                index = 0
+                order = {}
+                valid_posts = []
+                orderby = '-date'                                                           #75% new posts will be returned
+                if(random.randint(0,4)==0):
+                    orderby = '-order'                                                     #25% trending will be returned
+                for post in Post.objects.order_by(orderby):
+                    value = index
+                    for following in Follow.objects.filter(follower=user).order_by('-date'):
+                        if(post.user==following):
+                            if(len(SearchesUser.objects.filter(searchedUser=following, user=user))==0):          #User has not searched him
+                                value+=10
+                            else:
+                                value-=5*len(SearchesUser.objects.filter(searchedUser=following, user=user))     #This will make users with more searches come first
+                    valid_posts.append(post)
+                    order[index] = value
+                    index+=1
+                post=get_element_random(valid_posts,order)
+            elif(choose>=6 and choose<10):                                                 #40% of the times it will choose from trending
+                trending = getTrending(20)
+                trend = random.choice(trending)
+                topic = Topic.objects.filter(id=trend['topic'])[0]
+                post = pick_post(topic)
+        newPost = None
+        while(newPost==None):
+            newPost = pick_post(post.topic)
+            print(newPost,post)
+            if(newPost.id==post.id and ((newPost.image!=None and post.image!=None) or (newPost.video!=None and post.video!=None))):
+                newPost=None
+        if(len(Versus.objects.filter(post1=post, post2=newPost))==0):
+            versus = Versus(post1=post, post2=newPost)
+            versus.save()
+            data = VersusSerializer(versus).data
+            returning =  (data)
+            done = True
+        versus = Versus.objects.filter(post1=post, post2=newPost)[0]
+        if(len(Vote.objects.filter(versus=versus))==0):
+            data = VersusSerializer(versus).data
+            returning = (data)
+            done = True
+    return returning
 
 class VotarkUserViewSet(viewsets.ModelViewSet):
     queryset = VotarkUser.objects.all()
@@ -55,7 +108,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                     'following': True,
                     'mystories':evaluate,
                     'partial_update': evaluate,
-                    'pick': evaluate,
+                    'pick': True,
                     'posts': True,
                     'restore_password': True,
                     'retrieve': True,
@@ -65,6 +118,8 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                     'searchUser': True,
                     'stories': evaluate,
                     'update': evaluate,
+                    'versus': True,
+                    'isfollowing': True
                 }
             }
         ),
@@ -115,6 +170,13 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         return Response(response)
 
     @action(detail=True, methods=['get'])
+    def isfollowing(self, request, pk=None):
+        user = self.request.user
+        asking = self.get_object()
+        isfollowing = len(Follow.objects.filter(follower=user, user=asking))!=0
+        return Response({'result':isfollowing})
+
+    @action(detail=True, methods=['get'])
     def chats(self, request, pk=None):
         user = self.get_object()
         response = []
@@ -138,6 +200,18 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
             response.append(SearchedUserSerializer(searched).data)
         return Response(response)
 
+    @action(detail=True, methods=['post'])
+    def search_user(self, request):
+        user = self.get_object()
+        response = []
+        try:
+            following = VotarkUser.objects.filter(username=request.data['username'])
+            for follower in Follow.objects.filter(follower=user):
+                if(follower.following==following):
+                    return Response({'detail': 'true'})
+            return Response({'detail': 'false'})
+        except:
+            return Response({'detail':'username is not valid'})        
     
     @action(detail=True, methods=['post'])
     def search_user(self, request):
@@ -224,39 +298,43 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
             response.append(PostSerializer(post).data)
         return Response(response)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=False, methods=['get'])
+    def versus(self, request, pk=None):
+        user = self.request.user
+        response = []
+        for i in range(0,2):
+            new = getVersus(user)
+            while(new in response):
+                new = getVersus(user)
+            response.append(new)
+        return Response(response)
+
+    @action(detail=False, methods=['post'])
     def pick(self, request, pk=None):
-        post = None
-        while(post==None):
-            choose = random.randint(0,10)
-            if(choose<6):                                                                  #60% of the times it will choose from the followed users
-                user = self.get_object()
-                index = 0
-                order = {}
-                valid_posts = []
-                orderby = '-date'                                                           #75% new posts will be returned
-                if(random.randint(0,4)==0):
-                    order_by = '-order'                                                     #25% trending will be returned
-                for post in Post.objects.order_by(orderby):
-                    for following in Follow.objects.filter(follower=user).order():
-                        if(post.user==following):
-                            value = index
-                            if(SearchesUser.objects.filter(searchedUser=following, user=user).Count()==0):          #User has not searched him
-                                value+=10
-                            else:
-                                value-=5*SearchesUser.objects.filter(searchedUser=following, user=user).Count()     #This will make users with more searches come first
-                            valid_posts.append(post)
-                            order[index] = value
-                    index+=1
-                post=get_element_random(valid_posts,order)
-            elif(choose>=6 and choose<10):                                                 #40% of the times it will choose from trending
-                trending = getTrending(20)
-                trend = random.choice(trending)
-                topic = Topic.objects.filter(name=trend.topic)
-                post = pick_post(topic)
-        newPost = pick_post(post.topic)
-        if (Versus.objects.filter(post1=post, post2=newPost).Count()==0):
-            versus = Versus.create(post1=post, post2=pick_post(post.topic))
-            versus.save()
-            return Response(VersusSerializer(versus).data)
-        return Response(VersusSerializer(Versus.objects.filter(post1=post, post2=newPost)[0]).data)
+        try:
+            done = False
+            returning = None
+            while(done==False):
+                postid = int(request.data['postid'])
+                post = Post.objects.filter(id=postid)[0]
+                user = self.request.user
+                newPost = None
+                while(newPost==None):
+                    newPost = pick_post(post.topic)
+                    print(newPost,post)
+                    if(newPost.id==post.id and ((newPost.image!=None and post.image!=None) or (newPost.video!=None and post.video!=None))):
+                        newPost=None
+                if(len(Versus.objects.filter(post1=post, post2=newPost))==0):
+                    versus = Versus(post1=post, post2=newPost)
+                    data = VersusSerializer(versus).data
+                    returning =  Response(data)
+                    done = True
+                versus = Versus.objects.filter(post1=post, post2=newPost)[0]
+                if(len(Vote.objects.filter(versus=versus))==0):
+                    data = VersusSerializer(versus).data
+                    returning = Response(data)
+                    done = True
+            return returning
+        except:
+            return Response({'detail':'postid is not valid'})
+    

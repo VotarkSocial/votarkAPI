@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db.models import Count
 from guardian.shortcuts import assign_perm
 from hashtag.models import Hashtag
 from hashtag.serializers import HashtagSerializer
@@ -15,12 +16,7 @@ def evaluate(user, obj, request):
     return user.id == obj.creator.id
 
 def getTrending(limit):
-    response = []
-    for post in Post.objects.values('topic').annotate(count=Count('topic')).order_by('count'):
-        if(limit>0):
-            response.append({ 'topic': post.topic.name,'count':post.count})
-        limit-=1
-    return Response(response) 
+    return (Post.objects.values('topic').annotate(count=Count('topic')).order_by('count')) 
 
 class TopicViewSet(viewsets.ModelViewSet):
     queryset = Topic.objects.all()
