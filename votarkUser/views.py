@@ -34,6 +34,7 @@ import random
 import smtplib
 import uuid
 
+
 EMAIL_ADRESS = 'votark.socialnet@gmail.com'
 EMAIL_PASSWORD = os.environ.get('PASSWORD')
 
