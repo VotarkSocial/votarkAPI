@@ -302,7 +302,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
     def versus(self, request, pk=None):
         user = self.request.user
         response = []
-        for i in range(0,2):
+        for i in range(0,3):
             new = getVersus(user)
             while(new in response):
                 new = getVersus(user)
