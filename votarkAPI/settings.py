@@ -21,9 +21,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '&j-klwxu_)sjxr9q592l6y5!q+p04v#-w$+5#+*g8(gy#e9fch'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['cfehome.herokuapp.com']
 
 
 # Application definition
@@ -63,6 +63,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -99,10 +100,10 @@ WSGI_APPLICATION = 'votarkAPI.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'iotd',
-        'USER': 'admin',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
+        'NAME': 'daq7mb0o4e5h3k',
+        'USER': 'dlladaprpedpps',
+        'PASSWORD': '492cedbe4c1072de9648df31b1690b60ee8ad4006562fd12c898f6b462d17519',
+        'HOST': 'ec2-34-225-82-212.compute-1.amazonaws.com',
         'PORT': '5432',
     }
 }
@@ -152,7 +153,12 @@ MEDIA_URL = '/media/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
+
+STATIC_ROOT = os.path.join(BASE_DIR, "live-static-files", "static-root")
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "live-static-files", "media-root")
 
 
 REST_FRAMEWORK = {
