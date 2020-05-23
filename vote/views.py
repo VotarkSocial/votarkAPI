@@ -17,6 +17,13 @@ import random
 def evaluate(user, obj, request):
     return user.id == obj.user.id
 
+
+def getWinner(vote):
+    if(vote.winner):
+        return vote.versus.post1
+    else:
+        return vote.versus.post2
+
 class VoteViewSet(viewsets.ModelViewSet):
     queryset = Vote.objects.all()
     serializer_class = VoteSerializer
@@ -38,15 +45,9 @@ class VoteViewSet(viewsets.ModelViewSet):
         ),
     )
 
-    def getWinner(versus):
-        if(versus.winner):
-            return versus.post1
-        else:
-            return versus.post2
-
     def perform_create(self, serializer):
         vote = serializer.save()
-        post = getWinner(vote.versus)
+        post = getWinner(vote)
         post.victories += 1
         post.save()
         hasToChangedOrder = True
@@ -61,13 +62,15 @@ class VoteViewSet(viewsets.ModelViewSet):
                 Random Pick by system
         """
 
-        while(hasToChangedOrder):                                                                                   #hierarchy:
-            currentPost = Post.objects.filter(topic=post.topic, order=post.order-1)
+        while(hasToChangedOrder):                                                                   #hierarchy:
+            if(post.order==1):
+                hasToChangedOrder = False
+            currentPost = Post.objects.filter(topic=post.topic, order=post.order-1)[0]
             if(currentPost.victories>post.victories):                                                                   #Victories
                 hasToChangedOrder = False
             elif(currentPost.victories<post.victories):
-                currentPost.order-=1
-                post.order+=1
+                currentPost.order+=1
+                post.order-=1
                 currentPost.save()
                 post.save()
             else:
@@ -88,67 +91,67 @@ class VoteViewSet(viewsets.ModelViewSet):
                 if(secondaryVictories_current>secondaryVictories_post):
                     hasToChangedOrder = False
                 elif(secondaryVictories_current<secondaryVictories_post):
-                    currentPost.order-=1
-                    post.order+=1
+                    currentPost.order+=1
+                    post.order-=1
                     currentPost.save()
                     post.save()
                 else:
                     followerOnPost = 0
                     for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):                  #Followers because of the Post
-                        followerOnPost += Follow.objects.filter(onVersus=versus).Count()
+                        followerOnPost += len(Follow.objects.filter(onVersus=versus))
                     followerOnCurrent = 0
                     for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):
-                        followerOnCurrent += Follow.objects.filter(onVersus=versus).Count()
+                        followerOnCurrent += len(Follow.objects.filter(onVersus=versus))
                     if(followerOnCurrent>followerOnPost):
                         hasToChangedOrder = False
                     elif(followerOnCurrent<followerOnPost):
-                        currentPost.order-=1
-                        post.order+=1
+                        currentPost.order+=1
+                        post.order-=1
                         currentPost.save()
                         post.save()
                     else:
                         shareOnPost = 0
                         for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):                  #shares because of the Post
-                            shareOnPost += Share.objects.filter(versus=versus).Count()
+                            shareOnPost += len(Share.objects.filter(versus=versus))
                         shareOnCurrent = 0
                         for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):
-                            shareOnCurrent += Share.objects.filter(versus=versus).Count()
+                            shareOnCurrent += len(Share.objects.filter(versus=versus))
                         if(shareOnCurrent>shareOnPost):
                             hasToChangedOrder = False
                         elif(shareOnCurrent<shareOnPost):
-                            currentPost.order-=1
-                            post.order+=1
+                            currentPost.order+=1
+                            post.order-=1
                             currentPost.save()
                             post.save()
                         else:
                             likeOnPost = 0
                             for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):               #Likes because of the Post
-                                likeOnPost += Like.objects.filter(versus=versus).Count()
+                                likeOnPost += len(Like.objects.filter(versus=versus))
                             likeOnCurrent = 0
                             for versus in Versus.objects.filter(Q(post1=post) | Q(post2=post)):
-                                likeOnCurrent += Like.objects.filter(versus=versus).Count()
+                                likeOnCurrent += len(Like.objects.filter(versus=versus))
                             if(likeOnCurrent>likeOnPost):
                                 hasToChangedOrder = False
                             elif(likeOnCurrent<likeOnPost):
-                                currentPost.order-=1
-                                post.order+=1
+                                currentPost.order+=1
+                                post.order-=1
                                 currentPost.save()
                                 post.save()
                             else:
                                 if(likeOnCurrent>likeOnPost):
                                     hasToChangedOrder = False
                                 elif(likeOnCurrent<likeOnPost):
-                                    currentPost.order-=1
-                                    post.order+=1
+                                    currentPost.order+=1
+                                    post.order-=1
                                     currentPost.save()
                                     post.save()
                                 else:
-                                    pick = random.randit(0,1)                                                                  #Random 
+                                    pick = random.randint(0,1)                                                                  #Random 
                                     if(pick==0):
                                         hasToChangedOrder = False
                                     elif(pick==1):
-                                        currentPost.order-=1
-                                        post.order+=1
+                                        currentPost.order+=1
+                                        post.order-=1
                                         currentPost.save()
                                         post.save()
                                     hasToChangedOrder = False                  

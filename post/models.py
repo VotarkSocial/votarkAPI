@@ -6,7 +6,7 @@ class Post(models.Model):
     image = models.ImageField(null=True, blank=True)
     video = models.FileField(upload_to='videos/', null=True, verbose_name="")
     description = models.CharField(max_length=500,null=True)
-    victories = models.IntegerField(null=True)
+    victories = models.IntegerField(null=False, default=0)
     date = models.DateTimeField(default=now)
     order = models.IntegerField(null=True)
     topic = models.ForeignKey(

@@ -15,7 +15,7 @@ class Vote(models.Model):
         null=True,
         blank=False
     )
-    date = models.DateField(default=now)
+    date = models.DateTimeField(default=now)
     winner = models.BooleanField(null=False,blank=False)    #True for Post1 - False for Post2s
 
     

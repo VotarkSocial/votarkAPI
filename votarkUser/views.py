@@ -75,7 +75,6 @@ def getVersus(user):
         newPost = None
         while(newPost==None):
             newPost = pick_post(post.topic)
-            print(newPost,post)
             if(newPost.id==post.id and ((newPost.image!=None and post.image!=None) or (newPost.video!=None and post.video!=None))):
                 newPost=None
         if(len(Versus.objects.filter(post1=post, post2=newPost))==0):
@@ -322,7 +321,6 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                 newPost = None
                 while(newPost==None):
                     newPost = pick_post(post.topic)
-                    print(newPost,post)
                     if(newPost.id==post.id and ((newPost.image!=None and post.image!=None) or (newPost.video!=None and post.video!=None))):
                         newPost=None
                 if(len(Versus.objects.filter(post1=post, post2=newPost))==0):
