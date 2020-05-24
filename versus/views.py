@@ -21,11 +21,7 @@ import random
 
 def getComments(versus):
     response = []
-    for comment in Comment.objects.filter(versus=versus):
-        response.append(CommentSerializer(comment).data)
-    for comment in Comment.objects.filter(post=versus.post1):
-        response.append(CommentSerializer(comment).data)
-    for comment in Comment.objects.filter(post=versus.post2):
+    for comment in Comment.objects.filter(versus=versus).order_by('date'):
         response.append(CommentSerializer(comment).data)
     return (response)    
 
