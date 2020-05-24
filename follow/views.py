@@ -20,6 +20,7 @@ class FollowViewSet(viewsets.ModelViewSet):
                 'base': {
                     'create': True,
                     'list': True,
+                    'unfollow': True,
                 },
                 'instance': {
                     'destroy': evaluate,
@@ -30,3 +31,14 @@ class FollowViewSet(viewsets.ModelViewSet):
             }
         ),
     )
+
+    @action(detail=False, methods=['post'])
+    def unfollow(self, request):
+        try:
+            user = self.request.user
+            userid = request.data['id']
+            follow = Follow.objects.filter(user=user,follower=userid)
+            follow.delete()
+            return Response({'status':'ok'})
+        except:
+            return Response({'detail':'id is not valid'})   

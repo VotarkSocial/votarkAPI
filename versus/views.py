@@ -195,7 +195,9 @@ class VersusViewSet(viewsets.ModelViewSet):
         user = self.request.user
         versus = self.get_object()
         if(len(Like.objects.filter(reaction=0, user=user, versus=versus))!=0):
-            return Response(LikeSerializer(Like.objects.filter(reaction=0, user=user, versus=versus)).data)
+            data = LikeSerializer(Like.objects.filter(reaction=0, user=user, versus=versus)[0]).data
+            data['result'] = True
+            return Response(data)
         return Response({'result':False})
 
     @action(detail=True, methods=['get'])
@@ -203,7 +205,9 @@ class VersusViewSet(viewsets.ModelViewSet):
         user = self.request.user
         versus = self.get_object()
         if(len(Like.objects.filter(reaction=1, user=user, versus=versus))!=0):
-            return Response(LikeSerializer(Like.objects.filter(reaction=1, user=user, versus=versus)).data)
+            data = LikeSerializer(Like.objects.filter(reaction=1, user=user, versus=versus)[0]).data
+            data['result'] = True
+            return Response(data)
         return Response({'result':False})    
 
     @action(detail=True, methods=['get'])
