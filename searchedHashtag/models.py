@@ -4,14 +4,14 @@ from django.utils.timezone import now
 class SearchedHashtag(models.Model):
     user = models.ForeignKey(
         'votarkUser.VotarkUser',
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.CASCADE,
+        null=False,
         blank=False
     )
     hashtag = models.ForeignKey(
-        'post.Post',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=False
+        'hashtag.Hashtag',
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
     )
     date = models.DateTimeField(default=now)

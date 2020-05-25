@@ -5,15 +5,15 @@ class SearchedUser(models.Model):
     user = models.ForeignKey(
         'votarkUser.VotarkUser',
         related_name='userSearches',
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.CASCADE,
+        null=False,
         blank=False
     )
     searchedUser = models.ForeignKey(
         'votarkUser.VotarkUser',
         related_name='searched',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=False
+        on_delete=models.CASCADE,
+        null=False,
+        blank=False,
     )
     date = models.DateTimeField(default=now)
