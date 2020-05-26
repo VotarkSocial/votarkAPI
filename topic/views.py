@@ -16,7 +16,7 @@ def evaluate(user, obj, request):
     return user.id == obj.creator.id
 
 def getTrending(limit):
-    return (Post.objects.values('topic').annotate(count=Count('topic')).order_by('count')) 
+    return (Post.objects.values('topic').annotate(count=Count('topic')).order_by('-count')) 
 
 class TopicViewSet(viewsets.ModelViewSet):
     queryset = Topic.objects.all()
@@ -32,7 +32,7 @@ class TopicViewSet(viewsets.ModelViewSet):
                 'instance': {
                     'destroy': evaluate,
                     'hashtags': True,
-                    'order':evaluate,
+                    'order': True,
                     'partial_update': evaluate,
                     'retrieve': True,
                     'trending': True,
@@ -52,12 +52,15 @@ class TopicViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, url_path='trending', methods=['get'])
     def trending(self, request):
-        return Response(getTrending(100))
+        response = []
+        for topic in getTrending(100):
+            response.append(TopicSerializer(Topic.objects.filter(id=topic['topic'])[0]).data)
+        return Response(response)
 
     @action(detail=True, methods=['get'])
     def order(self, request, pk=None):
         topic = self.get_object()
         response = []
-        for post in Post.objects.filter(topic=topic):
-            response.append({ post.user.username : post.order })
+        for post in Post.objects.filter(topic=topic).order_by('order'):
+            response.append(PostSerializer(post).data)
         return Response(response)    

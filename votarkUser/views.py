@@ -232,7 +232,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         try:
             query = request.data['query']
-            users = VotarkUser.objects.filter(username__contains=query)
+            users = VotarkUser.objects.filter(username__icontains=query)
             response=[]
             limit=5
             for votarker in users:
@@ -249,7 +249,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         try:
             query = request.data['query']
-            hashtags = Hashtag.objects.filter(content__contains=query)
+            hashtags = Hashtag.objects.filter(content__icontains=query)
             response=[]
             limit=5
             for hash in hashtags:
