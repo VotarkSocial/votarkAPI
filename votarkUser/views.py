@@ -7,8 +7,8 @@ from follow.models import Follow
 from follow.serializers import FollowSerializer
 from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_objects_for_user
-from hashtag.serializers import HashtagSerializer
 from hashtag.models import Hashtag
+from hashtag.serializers import HashtagSerializer
 from like.models import Like
 from permissions.services import APIPermissionClassFactory
 from post.models import Post
@@ -21,6 +21,8 @@ from searchedHashtag.models import SearchedHashtag
 from searchedHashtag.serializers import SearchedHashtagSerializer
 from searchedUser.models import SearchedUser
 from searchedUser.serializers import SearchedUserSerializer
+from story.models import Story
+from story.serializers import StorySerializer
 from topic.models import Topic
 from topic.views import getTrending
 from versus.models import Versus
@@ -111,7 +113,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                     'destroy': evaluate,
                     'followers': True,
                     'following': True,
-                    'mystories':evaluate,
+                    'mystories':True,
                     'partial_update': evaluate,
                     'pick': True,
                     'posts': True,
@@ -271,27 +273,27 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         for following in Follow.objects.filter(follower=user).order_by('-date'):
             subresponse = {}
             value = index
-            if Story.objects.filter(user=following).Count()!=0:
+            if len(Story.objects.filter(user=following.follower))!=0:
                 subresponse['user'] = following                                                          #Order them by user
                 stories = []
                 for story in Story.objects.filter(user=following).order_by('-date'):                     
                     story = {}           
                     story['story'] = stories.append(StorySerializer(story).data)                              
-                    if(ViewedStory.objects.filter(story=story, user=user).Count()==0):                  #Check if the user has not seen the story
+                    if (len(ViewedStory.objects.filter(story=story, user=user))==0):                  #Check if the user has not seen the story
                         story['viewed'] = False
                     else:
                         value+=100                                                                      #This will make it go to the end of the order
                         story['viewed'] = True
                     stories.append(story)
-                if(SearchesUser.objects.filter(searchedUser=following, user=user).Count()==0):          #User has not searched him
+                if (len(SearchesUser.objects.filter(searchedUser=following, user=user))==0):          #User has not searched him
                     value+=30
                 else:
-                    value-=5*SearchesUser.objects.filter(searchedUser=following, user=user).Count()     #THis will make users with more searches come first
+                    value-=5*len(SearchesUser.objects.filter(searchedUser=following, user=user))     #THis will make users with more searches come first
                 subresponse['stories'] = stories
                 order[index] = value
                 current_response.append(subresponse)
             index+=1
-        order = {k: v for k, v in sorted(x.items(), key=lambda item: item[1])}                          #Sorting by value
+        order = {k: v for k, v in sorted(order.items(), key=lambda item: item[1])}                          #Sorting by value
         response = []
         for key in order:
             response.append(current_response[key])                                                      #Returning them in the specified order
