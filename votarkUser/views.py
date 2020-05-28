@@ -181,7 +181,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
     def isfollowing(self, request, pk=None):
         user = self.request.user
         asking = self.get_object()
-        isfollowing = len(Follow.objects.filter(follower=user, user=asking))!=0
+        isfollowing = len(Follow.objects.filter(follower=asking,user=user.id))!=0
         return Response({'result':isfollowing})
 
     @action(detail=True, methods=['get'])

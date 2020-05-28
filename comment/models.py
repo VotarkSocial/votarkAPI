@@ -6,7 +6,7 @@ class Comment(models.Model):
     date = models.DateTimeField(default=now)
     user = models.ForeignKey(
         'votarkUser.VotarkUser',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=False
     )

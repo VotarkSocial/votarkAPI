@@ -32,6 +32,14 @@ class FollowViewSet(viewsets.ModelViewSet):
         ),
     )
 
+    def perform_create(self, serializer):
+        follow = serializer
+        user = serializer.validated_data['user']
+        follower = serializer.validated_data['follower']
+        if(user!=follower and len(Follow.objects.filter(user=user, follower=follower))==0):
+            follow.save()
+        return Response(serializer.data)
+
     @action(detail=False, methods=['post'])
     def unfollow(self, request):
         try:
