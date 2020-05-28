@@ -124,7 +124,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                     'search_hashtag': evaluate,
                     'search_user': evaluate,
                     'search_follower': True,
-                    'stories': evaluate,
+                    'stories': True,
                     'update': evaluate,
                     'versus': True,
                     'isfollowing': True
@@ -162,7 +162,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                 
 
     @action(detail=True, methods=['get'])
-    def followers(self, request, pk=None):
+    def following(self, request, pk=None):
         user = self.get_object()
         response = []
         for follower in Follow.objects.filter(user=user):
@@ -170,7 +170,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
         return Response(response)    
 
     @action(detail=True, methods=['get'])
-    def following(self, request, pk=None):
+    def followers(self, request, pk=None):
         user = self.get_object()
         response = []
         for follower in Follow.objects.filter(follower=user):
