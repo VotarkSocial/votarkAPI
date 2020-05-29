@@ -1,6 +1,6 @@
 from chat.models import Chat
 from chat.serializers import ChatSerializer
-from django.contrib.auth.models import User
+from votarkUser.models import VotarkUser
 from guardian.shortcuts import assign_perm
 from message.models import Message
 from message.serializers import MessageSerializer
@@ -52,21 +52,21 @@ class ChatViewSet(viewsets.ModelViewSet):
     def add(self, request, pk=None):
         try:
             chat = self.get_object()
-            username = request.data['username']
-            user = VotarkUser.objects.get(username=username)
+            userid = request.data['id']
+            user = VotarkUser.objects.get(id=userid)
             assign_perm('chat.view_chat', user, chat)
             return Response(serializer.data)
         except:
-            return Response({'detail':'username is not valid'})
+            return Response({'detail':'id is not valid'})
 
     @action(detail=True, url_path='add', methods=['post'])
     def add_admin(self, request, pk=None):
         try:
             chat = self.get_object()
-            username = request.data['username']
-            user = VotarkUser.objects.get(username=username)
+            userid = request.data['id']
+            user = VotarkUser.objects.get(username=userid)
             assign_perm('chat.view_chat', user, chat)
             assign_perm('chat.admin_chat', user, chat)
             return Response(serializer.data)
         except:
-            return Response({'detail':'username is not valid'})
+            return Response({'detail':'id is not valid'})

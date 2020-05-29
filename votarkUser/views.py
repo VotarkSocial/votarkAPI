@@ -37,6 +37,7 @@ import os
 import random
 import smtplib
 import uuid
+from guardian.shortcuts import assign_perm, get_users_with_perms
 
 
 EMAIL_ADRESS = 'votark.socialnet@gmail.com'
@@ -188,7 +189,7 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
     def chats(self, request, pk=None):
         user = self.get_object()
         response = []
-        for chat in get_objects_for_user(joe, 'chat.view_chat').order_by('-date'):
+        for chat in get_objects_for_user(user, 'chat.view_chat').order_by('-date'):
             response.append(ChatSerializer(chat).data)
         return Response(response)
 
