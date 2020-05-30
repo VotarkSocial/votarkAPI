@@ -18,16 +18,16 @@ class ChatViewSet(viewsets.ModelViewSet):
             permission_configuration={
                 'base': {
                     'create': True,
-                    'list': False,
+                    'list': True,
                 },
                 'instance': {
                     'add_admin': 'chat.admin_chat',
-                    'add': 'chat.admin_chat',
-                    'destroy': 'chat.admin_chat',
+                    'add': 'chat.change_chat',
+                    'destroy': 'chat.change_chat',
                     'messages': 'chat.view_chat',
-                    'partial_update': 'chat.admin_chat',
+                    'partial_update': 'chat.change_chat',
                     'retrieve': 'chat.view_chat',
-                    'update': 'chat.admin_chat',
+                    'update': 'chat.change_chat',
                 }
             }
         ),
@@ -37,11 +37,12 @@ class ChatViewSet(viewsets.ModelViewSet):
         chat = serializer.save()
         user = self.request.user
         assign_perm('chat.view_chat', user, chat)
-        assign_perm('chat.admin_chat', user, chat)
+        assign_perm('chat.change_chat', user, chat)
+        print(serializer)
         return Response(serializer.data)
 
     @action(detail=True, methods=['get'])
-    def messasges(self, request, pk=None):
+    def messages(self, request, pk=None):
         chat = self.get_object()
         response = []
         for message in Message.objects.filter(chat=chat).order_by('date'):
@@ -55,8 +56,9 @@ class ChatViewSet(viewsets.ModelViewSet):
             userid = request.data['id']
             user = VotarkUser.objects.get(id=userid)
             assign_perm('chat.view_chat', user, chat)
-            return Response(serializer.data)
-        except:
+            return Response({'status':'ok'})
+        except Exception as e:
+            print(e)
             return Response({'detail':'id is not valid'})
 
     @action(detail=True, url_path='add', methods=['post'])
@@ -66,7 +68,7 @@ class ChatViewSet(viewsets.ModelViewSet):
             userid = request.data['id']
             user = VotarkUser.objects.get(username=userid)
             assign_perm('chat.view_chat', user, chat)
-            assign_perm('chat.admin_chat', user, chat)
-            return Response(serializer.data)
+            assign_perm('chat.change_chat', user, chat)
+            return Response({'status':'ok'})
         except:
             return Response({'detail':'id is not valid'})

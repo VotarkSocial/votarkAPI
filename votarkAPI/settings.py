@@ -99,7 +99,7 @@ WSGI_APPLICATION = 'votarkAPI.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'iotd',
+        'NAME': 'votark',
         'USER': 'admin',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
