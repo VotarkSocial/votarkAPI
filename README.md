@@ -1,6 +1,32 @@
 # votarkAPI
 django rest API for votark social network for voting!
 
+HELLO EVERYONE IN THE README YOU WILL FIND TWO THINGS:
+1.How to run?
+2.Documentation
+
+## 1.How to Run:
+
+1. Clone this repository
+2. Create a virtual enviroment for python
+3. Initialize the virtual enviroment
+4. Install requirements.txt through pip method
+5. Create a Database named votark in postgres with this credentials:
+
+    'NAME': 'votark',
+    'USER': 'admin',
+    'PASSWORD': 'admin',
+    'HOST': 'localhost',
+    'PORT': '5432',
+
+or change the lines 99-108 in the file votarkAPI/settings.py 
+
+6.  run python3 manage.py makemigrations
+7.  run python3 manage.py migrate
+8.  run  python3 manage.py run server
+
+
+## 2. Documentation:
 
 Following the valid api routes are listed:
 

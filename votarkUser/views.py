@@ -158,7 +158,8 @@ class VotarkUserViewSet(viewsets.ModelViewSet):
                 msg.set_content('Hi! ' + user.first_name + ' ' + user.last_name + ' your password has been restored\nusername: ' + user.username + '\npassword: ' + password + '\n\n\n THE TEAM OF VOTARK')
                 smtp.send_message(msg)
             return Response(request.data)
-        except:
+        except Exception as e:
+            print(e)
             return Response({'detail':'email is not valid'},status=status.HTTP_400_BAD_REQUEST)
                 
 
