@@ -2,8 +2,8 @@
 django rest API for votark social network for voting!
 
 HELLO EVERYONE IN THE README YOU WILL FIND TWO THINGS:
-1.How to run?
-2.Documentation
+#### 1.How to run?
+#### 2.Documentation
 
 ## 1.How to Run:
 
