@@ -26,7 +26,7 @@ psycopg2==2.8.5
 ptyprocess==0.6.0
 pyfcm==1.4.7
 Pygments==2.6.1
-PyJWT==1.7.1
+PyJWT==2.4.0
 python-http-client==3.2.7
 pytz==2019.3
 requests==2.23.0
